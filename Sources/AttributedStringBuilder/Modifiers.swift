@@ -16,59 +16,114 @@ import CrossKitTypes
 
 
 public extension String {
+    
     /// Sets the color of this text
-    func foregroundColor(_ color: UIColor) -> NSAttributedString {
-        NSAttributedString(string: self, attributes: [.foregroundColor : color])
+    func foregroundColor(_ color: NativeColor) -> NSAttributedString {
+        attributed.foregroundColor(color)
     }
+    
+    
     /// Sets the background color
-    func background(_ color: UIColor) -> NSAttributedString {
-        NSAttributedString(string: self, attributes: [.backgroundColor: color])
+    func background(_ color: NativeColor) -> NSAttributedString {
+        attributed.background(color)
     }
+    
+    
     /// Applies an underline to the text
-    func underline(_ color: UIColor, style: NSUnderlineStyle = .single) -> NSAttributedString {
-        NSAttributedString(string: self, attributes: [.underlineColor: color, .underlineStyle: style.rawValue])
+    func underline(_ color: NativeColor, style: NSUnderlineStyle = .single) -> NSAttributedString {
+        attributed.underline(color, style: style)
     }
+    
+    
     /// Sets the font for this text
-    func font(_ font: UIFont) -> NSAttributedString {
-        NSAttributedString(string: self, attributes: [.font: font])
+    func font(_ font: NativeFont) -> NSAttributedString {
+        attributed.font(font)
     }
+    
+    
     /// Adds a shadow to this text
     func shadow(_ shadow: NSShadow) -> NSAttributedString {
-        NSAttributedString(string: self, attributes: [.shadow: shadow])
+        attributed.shadow(shadow)
     }
+    
+    
     /// Returns this string as an `NSAttributedString`
     var attributed: NSAttributedString {
         NSAttributedString(string: self)
     }
 }
 
+
+
 public extension NSAttributedString {
+    
     /// Sets the color of this text
-    func foregroundColor(_ color: UIColor) -> NSAttributedString {
-        self.apply([.foregroundColor : color])
+    func foregroundColor(_ color: NativeColor) -> Self {
+        self.applying(.foregroundColor, value: color)
     }
+    
+    
     /// Sets the background color
-    func background(_ color: UIColor) -> NSAttributedString {
-        self.apply([.backgroundColor: color])
+    func background(_ color: NativeColor) -> Self {
+        self.applying(.backgroundColor, value: color)
     }
+    
+    
     /// Applies an underline to the text
-    func underline(_ color: UIColor, style: NSUnderlineStyle = .single) -> NSAttributedString {
-        self.apply([.underlineColor: color, .underlineStyle: style.rawValue])
+    func underline(_ color: NativeColor, style: NSUnderlineStyle = .single) -> Self {
+        self.applying([.underlineColor: color, .underlineStyle: style.rawValue])
     }
+    
+    
     /// Sets the font for this text
-    func font(_ font: UIFont) -> NSAttributedString {
-        self.apply([.font: font])
+    func font(_ font: NativeFont) -> Self {
+        self.applying(.font, value: font)
     }
+    
+    
     /// Adds a shadow to this text
-    func shadow(_ shadow: NSShadow) -> NSAttributedString {
-        self.apply([.shadow:shadow])
+    func shadow(_ shadow: NSShadow) -> Self {
+        self.applying(.shadow, value:shadow)
     }
 }
 
+
+
 public extension NSAttributedString {
-    func apply(_ attributes: [NSAttributedString.Key:Any]) -> NSAttributedString {
-        let mutable = NSMutableAttributedString(string: self.string, attributes: self.attributes(at: 0, effectiveRange: nil))
-        mutable.addAttributes(attributes, range: NSMakeRange(0, (self.string as NSString).length))
-        return mutable
+    
+    var wholeRange: NSRange {
+        NSRange(location: 0, length: length)
+    }
+    
+    
+    func applying(_ key: NSAttributedString.Key, value: Any) -> Self {
+        let mutable = self.mutable()
+        mutable.addAttribute(key, value: value, range: wholeRange)
+        return Self.init(attributedString: mutable)
+    }
+    
+    
+    func applying(_ attributes: [NSAttributedString.Key:Any]) -> Self {
+        let mutable = self.mutable()
+        mutable.addAttributes(attributes, range: wholeRange)
+        return Self.init(attributedString: mutable)
+    }
+    
+    
+    @available(*, deprecated, renamed: "applying(_:)")
+    @inline(__always)
+    func apply(_ attributes: [NSAttributedString.Key : Any]) -> NSAttributedString { applying(attributes) }
+    
+    
+    func mutable() -> NSMutableAttributedString {
+        if let mutable = self as? NSMutableAttributedString {
+            return mutable
+        }
+        else if let mutable = self.mutableCopy() as? NSMutableAttributedString {
+            return mutable
+        }
+        else {
+            return NSMutableAttributedString(attributedString: self)
+        }
     }
 }
