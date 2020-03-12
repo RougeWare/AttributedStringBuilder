@@ -45,12 +45,6 @@ public extension String {
     func shadow(_ shadow: NSShadow) -> NSAttributedString {
         attributed.shadow(shadow)
     }
-    
-    
-    /// Returns this string as an `NSAttributedString`
-    var attributed: NSAttributedString {
-        NSAttributedString(string: self)
-    }
 }
 
 
