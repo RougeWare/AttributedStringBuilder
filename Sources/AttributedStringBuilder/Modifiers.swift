@@ -5,7 +5,15 @@
 //  Created by Carson Katri on 7/27/19.
 //
 
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
+
+import CrossKitTypes
+
+
 
 public extension String {
     /// Sets the color of this text

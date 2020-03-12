@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 @_functionBuilder
 public struct AttributedStringBuilder {
